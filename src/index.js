@@ -3,7 +3,7 @@ import countryCardTpl from './templates/country-card.hbs';
 import countryList from './templates/country-list.hbs';
 import API from './js/fetchCountries';
 import getRefs from './js/getRefs';
-import { notice, info, success, error } from '@pnotify/core';
+import { notice, info, error } from '@pnotify/core';
 import '@pnotify/core/dist/BrightTheme.css';
 
 const refs = getRefs();
@@ -17,15 +17,20 @@ function onSearch(e) {
   if (!searchQuery.trim()) {
     clearMarkUp();
     notice({
-      text: 'Please, enter your query',
-      delay: 5000,
+      text: 'Please, enter your query!',
+      delay: 2000,
     });
     return;
   }
 
+  /*if (!status.ok) {
+    clearMarkUp();
+
+  }
+*/
   API.fetchCountries(searchQuery)
     .then(renderAllTogether)
-    .catch(error => console.log(error));
+    .catch(e => console.log(e));
 }
 
 function renderAllTogether(countries) {
@@ -34,20 +39,21 @@ function renderAllTogether(countries) {
 
     info({
       text: 'Too many matches found. Please enter a more specific query!',
-      delay: 5000,
+      delay: 2000,
     });
   } else if (countries.length >= 2 && countries.length <= 10) {
+    clearMarkUp();
     renderCountryList(countries);
     renderCountryCard(countries);
-  } else if (!status.ok) {
+  } else if (countries.length === 1) {
     clearMarkUp();
-
-    error({
-      text: 'We can not find anything. Please write a valid query',
-      delay: 5000,
-    });
-  } else {
     renderCountryCard(countries);
+  } else {
+    clearMarkUp();
+    error({
+      text: 'We can not find anything. Please write a valid query!',
+      delay: 2000,
+    });
   }
 }
 
